@@ -1,0 +1,12 @@
+{
+  "name": "forum-engine-api",
+  "version": "1.0.0",
+  "description": "Using nodejs to write Forum engine api.",
+  "author": "Meshileya Seun <meshileyaseun@gmail.com/>",
+  "dependencies": {
+    "express": "^4.16.3"
+  },
+  "devDependencies": {
+
+  }
+}
