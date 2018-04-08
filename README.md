@@ -5,6 +5,6 @@
 * Javascript
 * basic API knowledge
 
-##How to run 
-run: yarn start
+## How to run 
+yarn start
 
