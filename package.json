@@ -5,7 +5,7 @@
   "author": "Meshileya Seun <meshileyaseun@gmail.com/>",
   "license": "MIT",
   "scripts": {
-    "start": "webpack --progress --color",
+    "start": "webpack --progress --color --mode=development",
     "test:unit": "NODE_ENV=testing rm -rf ./tmp/mocha-webpack && mocha-webpack --webpack-config webpack.testing.js \"src/**/*.test.js\" --timeout 10000 --require source-map-support/register",
     "test": "yarn run test:unit"
   },
