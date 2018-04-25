@@ -6,22 +6,24 @@ import mongoose from 'mongoose';
 export const schema = {
   title: {
     type: String,
-    required: [true, 'Title is required']
+    required: [true, 'Title is required'],
   },
 
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    required: [true, 'User is required']
+    required: [true, 'User is required'],
   },
 
   comment: [
     {
       user: {
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
       },
       message: {
-        type: String
-      }
-    }
-  ]
+        type: String,
+      },
+    },
+  ],
 };
+
+export const Post = mongoose.model('Posts', new mongoose.Schema(schema));
