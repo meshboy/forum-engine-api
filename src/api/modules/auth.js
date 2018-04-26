@@ -45,13 +45,12 @@ export const loginUser = (req, res, next) => {
     res.status(400).json({ status: false, message: result.error });
   }
   else {
-    User.find({ email }).exec()
+    User.findOne({ email }).exec()
       .then(user => {
         if (!user) {
 
           if (user.comparePassword(password)) {
             req.user = user;
-
             res.status(200)
               .json({ status: true, data: signIn(req.user._id) })
           }
@@ -97,5 +96,45 @@ export const getUser = (req, res, next) => {
     })
     .catch(error => next(error));
 };
+
+export const createUser = (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // validate the data coming from the client before processing
+  const schema = Joi.object().keys({
+    email: Joi.string().email(),
+    password: Joi.string(),
+  });
+
+  const result = Joi.validate({ email, password }, schema);
+
+  if (result.error) {
+    res.status(400).json({ status: false, message: result.error });
+  }
+  else {
+    User.findOne({ email })
+      .then(user => {
+
+        if (user) {
+          res.status(400).json({ status: false, message: 'email already exist' });
+        }
+        else {
+          const user = new User();
+          user.email = email;
+          user.passwordHash = user.generateHashPassword(password);
+
+          user.save(newUser => {
+            req.user = newUser;
+            res.status(200)
+              .json({ status: true, data: signIn(req.user._id) })
+          })
+          .catch(error => next(error));
+        }
+      })
+      .catch(error => next(error));
+  }
+
+}
 
 export const secure = [decodeToken(), getUser()];
