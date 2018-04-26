@@ -16,16 +16,18 @@ export const schema = {
     required: [true, 'password is required'],
   },
 };
-
+// create a mongoose schema and ensure a timestamp is added
 const userSchema = new mongoose.Schema(schema, { timestamps: true });
 
-userSchema.methods.comparePassword = function (plainTextPassword, callback) {
-  bcrypt.compare(plainTextPassword, this.passwordHash, callback);
+// compare the password with the hashed password
+userSchema.methods.comparePassword = function (plainTextPassword) {
+  return bcrypt.compareSync(plainTextPassword, this.passwordHash);
 };
 
-userSchema.methods.hasPassword = function (plainTextPassword, callback) {
-  const saltRounds = 10;
-  bcrypt.hash(plainTextPassword, saltRounds, callback);
+// generate hash password
+userSchema.methods.generateHashPassword = function (plainTextPassword) {
+  const saltRounds = bcrypt.genSaltSync(10);
+  return bcrypt.hashSync(plainTextPassword, saltRounds);
 };
 
 export const User = mongoose.model('Users', userSchema);
