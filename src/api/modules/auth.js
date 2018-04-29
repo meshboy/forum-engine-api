@@ -30,6 +30,7 @@ const validateToken = (req, res, next) => {
 };
 
 export const loginUser = (req, res, next) => {
+
   const email = req.body.email;
   const password = req.body.password;
 
@@ -47,12 +48,12 @@ export const loginUser = (req, res, next) => {
   else {
     User.findOne({ email }).exec()
       .then(user => {
-        if (!user) {
+        if (user) {
 
           if (user.comparePassword(password)) {
             req.user = user;
             res.status(200)
-              .json({ status: true, data: signIn(req.user._id) })
+              .json({ status: true, data: {token: signIn(req.user._id)} })
           }
           else {
             res.status(401)
@@ -77,7 +78,7 @@ export const loginUser = (req, res, next) => {
  */
 export const decodeToken = (req, res, next) => {
 
-  if (req.headers.access_token) {
+  if (req.headers['access_token']) {
     req.headers.authorization = 'Bearer ' + req.headers.access_token;
   }
   validateToken(req, res, next);
@@ -124,17 +125,16 @@ export const createUser = (req, res, next) => {
           user.email = email;
           user.passwordHash = user.generateHashPassword(password);
 
-          user.save(newUser => {
+          user.save().then(newUser => {
             req.user = newUser;
             res.status(200)
-              .json({ status: true, data: signIn(req.user._id) })
-          })
-          .catch(error => next(error));
+              .json({ status: true, data: {token: signIn(req.user._id)} })
+          }).catch(error => next(error));
         }
       })
       .catch(error => next(error));
   }
 
-}
+};
 
-export const secure = [decodeToken(), getUser()];
+// export const secure = [decodeToken(), getUser()];
