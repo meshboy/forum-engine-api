@@ -2,7 +2,8 @@
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
  **/
 import { expect } from 'chai';
-import { schema } from './user.model';
+import { schema, User } from './user.model';
+import createApiSec from '../../../../test/api.test';
 
 describe('User Model', () => {
 
@@ -19,3 +20,5 @@ describe('User Model', () => {
     expect(schema.passwordHash.required).to.be.an('array');
   });
 });
+
+createApiSec(User, 'User', { email: 'test@gmail.com', passwordHash: '123456' });

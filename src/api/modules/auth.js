@@ -1,8 +1,8 @@
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
 import ExpressJwt from 'express-jwt';
-import Jwt from 'jsonwebtoken'
+import Jwt from 'jsonwebtoken';
 import Joi from 'joi';
 import { User } from '../resources/user/user.model';
 
@@ -14,9 +14,7 @@ const checkToken = ExpressJwt({ secret });
  * @param id
  * @returns a token with user id being wrapped
  */
-const signIn = (id) => {
-  return Jwt.sign({ id }, secret, { expiresIn });
-};
+export const signIn = id => Jwt.sign({ id }, secret, { expiresIn });
 
 /**
  *
@@ -30,7 +28,6 @@ const validateToken = (req, res, next) => {
 };
 
 export const loginUser = (req, res, next) => {
-
   const email = req.body.email;
   const password = req.body.password;
 
@@ -44,23 +41,19 @@ export const loginUser = (req, res, next) => {
 
   if (result.error) {
     res.status(400).json({ status: false, message: result.error });
-  }
-  else {
+  } else {
     User.findOne({ email }).exec()
       .then(user => {
         if (user) {
-
           if (user.comparePassword(password)) {
             req.user = user;
             res.status(200)
-              .json({ status: true, data: {token: signIn(req.user._id)} })
-          }
-          else {
+              .json({ status: true, data: { token: signIn(req.user._id) } });
+          } else {
             res.status(401)
               .json({ status: false, message: 'Password is incorrect' });
           }
-        }
-        else {
+        } else {
           res.status(404)
             .json({ status: false, message: 'User does not exist! Kindly register' });
         }
@@ -71,32 +64,24 @@ export const loginUser = (req, res, next) => {
 
 /**
  *
- * @param req
- * @param res
- * @param next
  * once the Bearer tokenValue is matched, the validateToken grabs the token from req(request)
  */
-export const decodeToken = (req, res, next) => {
-
-  if (req.headers['access_token']) {
-    req.headers.authorization = 'Bearer ' + req.headers.access_token;
+export const decodeToken = () => (req, res, next) => {
+  if (req.headers.access_token) {
+    req.headers.authorization = `Bearer ${req.headers.access_token}`;
   }
   validateToken(req, res, next);
 };
 
-export const getUser = (req, res, next) => {
-
-  return User.findById(req.user._id)
+export const getUser = () => (req, res, next) => User.findById(req.user._id)
     .then(user => {
       if (!user) {
         req.user = user;
-      }
-      else {
+      } else {
         res.json({ status: false, message: 'User not found' });
       }
     })
     .catch(error => next(error));
-};
 
 export const createUser = (req, res, next) => {
   const email = req.body.email;
@@ -112,15 +97,12 @@ export const createUser = (req, res, next) => {
 
   if (result.error) {
     res.status(400).json({ status: false, message: result.error });
-  }
-  else {
+  } else {
     User.findOne({ email })
       .then(user => {
-
         if (user) {
           res.status(400).json({ status: false, message: 'email already exist' });
-        }
-        else {
+        } else {
           const user = new User();
           user.email = email;
           user.passwordHash = user.generateHashPassword(password);
@@ -128,13 +110,12 @@ export const createUser = (req, res, next) => {
           user.save().then(newUser => {
             req.user = newUser;
             res.status(200)
-              .json({ status: true, data: {token: signIn(req.user._id)} })
+              .json({ status: true, data: { token: signIn(req.user._id) } });
           }).catch(error => next(error));
         }
       })
       .catch(error => next(error));
   }
-
 };
 
-// export const secure = [decodeToken(), getUser()];
+export const secure = [decodeToken(), getUser()];

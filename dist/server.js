@@ -22,7 +22,7 @@ require("source-map-support").install();
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "52af9345034b1ef43a63"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "bb0468f2b5c2976370e3"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -892,7 +892,7 @@ if (true) {
 /*!*********************************!*\
   !*** ./src/api/modules/auth.js ***!
   \*********************************/
-/*! exports provided: loginUser, decodeToken, getUser, createUser */
+/*! exports provided: loginUser, decodeToken, getUser, createUser, secure */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -901,6 +901,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodeToken", function() { return decodeToken; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getUser", function() { return getUser; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createUser", function() { return createUser; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "secure", function() { return secure; });
 /* harmony import */ var express_jwt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express-jwt */ "express-jwt");
 /* harmony import */ var express_jwt__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express_jwt__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jsonwebtoken__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jsonwebtoken */ "jsonwebtoken");
@@ -1038,7 +1039,7 @@ var createUser = function createUser(req, res, next) {
   }
 };
 
-// export const secure = [decodeToken(), getUser()];
+var secure = [decodeToken(), getUser()];
 
 /***/ }),
 
