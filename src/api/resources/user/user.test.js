@@ -1,12 +1,11 @@
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
- **/
+ * */
 import { expect } from 'chai';
 import { schema, User } from './user.model';
 import createApiSec from '../../../../test/api.test';
 
 describe('User Model', () => {
-
   it('should contain an email', () => {
     expect(schema.email).to.exist;
     expect(schema.email.type).to.eql(String);

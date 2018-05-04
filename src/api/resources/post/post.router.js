@@ -6,13 +6,15 @@ import PostController from './post.controller';
 
 const postRouter = express.Router();
 
-postRouter.param('id', postRouter.findByParam)
+postRouter.param('id', postRouter.findByParam);
 
 postRouter.route('/')
   .post(PostController.createOne)
-  .get(PostController.getAll)
+  .get(PostController.getAll);
 
 postRouter.route('/:id')
   .get(PostController.getOne)
   .put(PostController.updateOne)
-  .pu
+  .delete(PostController.deleteOne);
+
+export default postRouter;

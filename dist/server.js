@@ -22,7 +22,7 @@ require("source-map-support").install();
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "bb0468f2b5c2976370e3"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "20ef5f3b529a444c83a8"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -892,11 +892,12 @@ if (true) {
 /*!*********************************!*\
   !*** ./src/api/modules/auth.js ***!
   \*********************************/
-/*! exports provided: loginUser, decodeToken, getUser, createUser, secure */
+/*! exports provided: signIn, loginUser, decodeToken, getUser, createUser, secure */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "signIn", function() { return signIn; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loginUser", function() { return loginUser; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodeToken", function() { return decodeToken; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getUser", function() { return getUser; });
@@ -911,7 +912,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources/user/user.model */ "./src/api/resources/user/user.model.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
 
 
 
@@ -941,7 +942,6 @@ var validateToken = function validateToken(req, res, next) {
 };
 
 var loginUser = function loginUser(req, res, next) {
-
   var email = req.body.email;
   var password = req.body.password;
 
@@ -958,7 +958,6 @@ var loginUser = function loginUser(req, res, next) {
   } else {
     _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findOne({ email: email }).exec().then(function (user) {
       if (user) {
-
         if (user.comparePassword(password)) {
           req.user = user;
           res.status(200).json({ status: true, data: { token: signIn(req.user._id) } });
@@ -976,30 +975,29 @@ var loginUser = function loginUser(req, res, next) {
 
 /**
  *
- * @param req
- * @param res
- * @param next
  * once the Bearer tokenValue is matched, the validateToken grabs the token from req(request)
  */
-var decodeToken = function decodeToken(req, res, next) {
-
-  if (req.headers['access_token']) {
-    req.headers.authorization = 'Bearer ' + req.headers.access_token;
-  }
-  validateToken(req, res, next);
+var decodeToken = function decodeToken() {
+  return function (req, res, next) {
+    if (req.headers.access_token) {
+      req.headers.authorization = 'Bearer ' + req.headers.access_token;
+    }
+    validateToken(req, res, next);
+  };
 };
 
-var getUser = function getUser(req, res, next) {
-
-  return _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findById(req.user._id).then(function (user) {
-    if (!user) {
-      req.user = user;
-    } else {
-      res.json({ status: false, message: 'User not found' });
-    }
-  }).catch(function (error) {
-    return next(error);
-  });
+var getUser = function getUser() {
+  return function (req, res, next) {
+    return _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findById(req.user._id).then(function (user) {
+      if (!user) {
+        req.user = user;
+      } else {
+        res.json({ status: false, message: 'User not found' });
+      }
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
 };
 
 var createUser = function createUser(req, res, next) {
@@ -1018,7 +1016,6 @@ var createUser = function createUser(req, res, next) {
     res.status(400).json({ status: false, message: result.error });
   } else {
     _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findOne({ email: email }).then(function (user) {
-
       if (user) {
         res.status(400).json({ status: false, message: 'email already exist' });
       } else {
