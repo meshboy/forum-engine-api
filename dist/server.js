@@ -22,7 +22,7 @@ require("source-map-support").install();
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "20ef5f3b529a444c83a8"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "6891025f352e161abb89"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -988,9 +988,14 @@ var decodeToken = function decodeToken() {
 
 var getUser = function getUser() {
   return function (req, res, next) {
-    return _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findById(req.user._id).then(function (user) {
-      if (!user) {
+
+    _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findById({ _id: req.user.id }).then(function (user) {
+      if (user) {
+        console.log(user);
         req.user = user;
+        // get user id and use where necessary
+        req.body.user = user.id;
+        next();
       } else {
         res.json({ status: false, message: 'User not found' });
       }
@@ -1019,12 +1024,12 @@ var createUser = function createUser(req, res, next) {
       if (user) {
         res.status(400).json({ status: false, message: 'email already exist' });
       } else {
-        var _user = new _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"]();
-        _user.email = email;
-        _user.passwordHash = _user.generateHashPassword(password);
+        var newUser = new _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"]();
+        newUser.email = email;
+        newUser.passwordHash = newUser.generateHashPassword(password);
 
-        _user.save().then(function (newUser) {
-          req.user = newUser;
+        newUser.save().then(function (doc) {
+          req.user = doc;
           res.status(200).json({ status: true, data: { token: signIn(req.user._id) } });
         }).catch(function (error) {
           return next(error);
@@ -1037,6 +1042,290 @@ var createUser = function createUser(req, res, next) {
 };
 
 var secure = [decodeToken(), getUser()];
+
+/***/ }),
+
+/***/ "./src/api/modules/errorHandler.js":
+/*!*****************************************!*\
+  !*** ./src/api/modules/errorHandler.js ***!
+  \*****************************************/
+/*! exports provided: errorHandler */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "errorHandler", function() { return errorHandler; });
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
+ * */
+var errorHandler = function errorHandler(error, req, res, next) {
+  console.error(error.stack);
+  res.status(500).json({
+    status: false,
+    message: error.toString() || 'something went wrong. Please try again'
+  });
+};
+
+/***/ }),
+
+/***/ "./src/api/modules/query.js":
+/*!**********************************!*\
+  !*** ./src/api/modules/query.js ***!
+  \**********************************/
+/*! exports provided: controllers, createOne, updateOne, deleteOne, getOne, getAll, findByParam, generateControllers */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "controllers", function() { return controllers; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createOne", function() { return createOne; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "updateOne", function() { return updateOne; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "deleteOne", function() { return deleteOne; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getOne", function() { return getOne; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAll", function() { return getAll; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findByParam", function() { return findByParam; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "generateControllers", function() { return generateControllers; });
+/* harmony import */ var babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babel-runtime/helpers/extends */ "babel-runtime/helpers/extends");
+/* harmony import */ var babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babel-runtime/core-js/promise */ "babel-runtime/core-js/promise");
+/* harmony import */ var babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! babel-runtime/core-js/object/assign */ "babel-runtime/core-js/object/assign");
+/* harmony import */ var babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_2__);
+
+
+
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
+ * */
+var controllers = {
+  createOne: function createOne(model, body) {
+    return model.create(body);
+  },
+  updateOne: function updateOne(docToUpdate, update) {
+    babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_2___default()(docToUpdate, update);
+    return docToUpdate.save();
+  },
+  deleteOne: function deleteOne(docToDelete) {
+    return docToDelete.remove();
+  },
+  getOne: function getOne(docToGet) {
+    return babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_1___default.a.resolve(docToGet);
+  },
+  getAll: function getAll(model) {
+    return model.find({});
+  },
+  findByParam: function findByParam(model, id) {
+    return model.findById(id);
+  }
+};
+
+var createOne = function createOne(model) {
+  return function (req, res, next) {
+    return controllers.createOne(model, req.body).then(function (doc) {
+      return res.status(201).json(doc);
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
+};
+
+var updateOne = function updateOne(model) {
+  return function (req, res, next) {
+    var docToUpdate = req.docFromId;
+    var update = req.body;
+
+    return controllers.updateOne(docToUpdate, update).then(function (doc) {
+      return res.status(201).json(doc);
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
+};
+
+var deleteOne = function deleteOne(model) {
+  return function (req, res, next) {
+    var docToDelete = req.docFromId;
+
+    return controllers.deleteOne(docToDelete).then(function (doc) {
+      return res.status(201).json(doc);
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
+};
+
+var getOne = function getOne(model) {
+  return function (req, res, next) {
+    var docToGet = req.docToGet;
+
+    return controllers.getOne(docToGet).then(function (doc) {
+      return res.status(200).json(doc);
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
+};
+
+var getAll = function getAll(model) {
+  return function (req, res, next) {
+    return controllers.getAll(model).then(function (doc) {
+      return res.status(200).json(doc);
+    }).catch(function (error) {
+      return next(error);
+    });
+  };
+};
+
+var findByParam = function findByParam(model) {
+  return function (req, res, next, id) {
+    return controllers.findByParam(model, id).then(function (doc) {
+      if (!doc) {
+        next(new Error('Not Found Error'));
+      } else {
+        req.docFromId = doc._id;
+        next();
+      }
+    }).catch(function (error) {
+      next(error);
+    });
+  };
+};
+
+var generateControllers = function generateControllers(model) {
+  var overrides = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+  var defaults = {
+    findByParam: findByParam(model),
+    getAll: getAll(model),
+    getOne: getOne(model),
+    deleteOne: deleteOne(model),
+    updateOne: updateOne(model),
+    createOne: createOne(model)
+  };
+
+  return babel_runtime_helpers_extends__WEBPACK_IMPORTED_MODULE_0___default()({}, defaults, overrides);
+};
+
+/***/ }),
+
+/***/ "./src/api/resources/post/index.js":
+/*!*****************************************!*\
+  !*** ./src/api/resources/post/index.js ***!
+  \*****************************************/
+/*! exports provided: postRouter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _post_router__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./post.router */ "./src/api/resources/post/post.router.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "postRouter", function() { return _post_router__WEBPACK_IMPORTED_MODULE_0__["postRouter"]; });
+
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
+ * */
+
+
+/***/ }),
+
+/***/ "./src/api/resources/post/post.controller.js":
+/*!***************************************************!*\
+  !*** ./src/api/resources/post/post.controller.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _modules_query__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../modules/query */ "./src/api/modules/query.js");
+/* harmony import */ var _post_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./post.model */ "./src/api/resources/post/post.model.js");
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
+ * */
+
+
+
+var getAll = function getAll(req, res, next) {
+  _post_model__WEBPACK_IMPORTED_MODULE_1__["Post"].find({}).populate('user', { email: 1 }).exec().then(function (docs) {
+    return res.json({ status: true, data: docs });
+  }).catch(function (error) {
+    return next(error);
+  });
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Object(_modules_query__WEBPACK_IMPORTED_MODULE_0__["generateControllers"])(_post_model__WEBPACK_IMPORTED_MODULE_1__["Post"], { getAll: getAll }));
+
+/***/ }),
+
+/***/ "./src/api/resources/post/post.model.js":
+/*!**********************************************!*\
+  !*** ./src/api/resources/post/post.model.js ***!
+  \**********************************************/
+/*! exports provided: schema, Post */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "schema", function() { return schema; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Post", function() { return Post; });
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "mongoose");
+/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
+ * */
+
+
+var schema = {
+  title: {
+    type: String,
+    required: [true, 'Title is required']
+  },
+
+  user: {
+    type: mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema.Types.ObjectId,
+    required: [true, 'User is required'],
+    ref: 'Users'
+  },
+
+  comment: [{
+    user: {
+      type: mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema.Types.ObjectId
+    },
+    message: {
+      type: String
+    }
+  }]
+};
+
+var Post = mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.model('Posts', new mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema(schema, { timestamps: true }));
+
+/***/ }),
+
+/***/ "./src/api/resources/post/post.router.js":
+/*!***********************************************!*\
+  !*** ./src/api/resources/post/post.router.js ***!
+  \***********************************************/
+/*! exports provided: postRouter */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "postRouter", function() { return postRouter; });
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
+/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _post_controller__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./post.controller */ "./src/api/resources/post/post.controller.js");
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
+ * */
+
+
+
+var postRouter = express__WEBPACK_IMPORTED_MODULE_0___default.a.Router();
+
+postRouter.param('id', _post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].findByParam);
+
+postRouter.route('/').get(_post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].getAll).post(_post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].createOne);
+
+postRouter.route('/:id').get(_post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].getOne).put(_post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].updateOne).delete(_post_controller__WEBPACK_IMPORTED_MODULE_1__["default"].deleteOne);
 
 /***/ }),
 
@@ -1057,7 +1346,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var bcrypt__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bcrypt__WEBPACK_IMPORTED_MODULE_1__);
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
- **/
+ * */
 
 
 
@@ -1103,12 +1392,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "router", function() { return router; });
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ "express");
 /* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _resources_post__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./resources/post */ "./src/api/resources/post/index.js");
+/* harmony import */ var _modules_errorHandler__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/errorHandler */ "./src/api/modules/errorHandler.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
+
+
 
 
 var router = express__WEBPACK_IMPORTED_MODULE_0___default.a.Router();
+router.use('/post', _resources_post__WEBPACK_IMPORTED_MODULE_1__["postRouter"]);
+router.use(_modules_errorHandler__WEBPACK_IMPORTED_MODULE_2__["errorHandler"]);
 
 /***/ }),
 
@@ -1231,7 +1526,7 @@ Object(_db__WEBPACK_IMPORTED_MODULE_1__["connect"])();
 
 app.use('/login', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["loginUser"]);
 app.use('/register', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["createUser"]);
-// app.use('/api/v1/', secure, router);
+app.use('/api/v1/', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["secure"], _api_router__WEBPACK_IMPORTED_MODULE_4__["router"]);
 /* harmony default export */ __webpack_exports__["default"] = (app);
 
 /***/ }),
@@ -1246,6 +1541,39 @@ app.use('/register', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["createUser"
 __webpack_require__(/*! webpack/hot/poll?1000 */"./node_modules/webpack/hot/poll.js?1000");
 module.exports = __webpack_require__(/*! ./src/index */"./src/index.js");
 
+
+/***/ }),
+
+/***/ "babel-runtime/core-js/object/assign":
+/*!******************************************************!*\
+  !*** external "babel-runtime/core-js/object/assign" ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/core-js/object/assign");
+
+/***/ }),
+
+/***/ "babel-runtime/core-js/promise":
+/*!************************************************!*\
+  !*** external "babel-runtime/core-js/promise" ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/core-js/promise");
+
+/***/ }),
+
+/***/ "babel-runtime/helpers/extends":
+/*!************************************************!*\
+  !*** external "babel-runtime/helpers/extends" ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("babel-runtime/helpers/extends");
 
 /***/ }),
 

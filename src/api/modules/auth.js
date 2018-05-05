@@ -73,15 +73,22 @@ export const decodeToken = () => (req, res, next) => {
   validateToken(req, res, next);
 };
 
-export const getUser = () => (req, res, next) => User.findById(req.user._id)
+export const getUser = () => (req, res, next) => {
+
+  User.findById({_id: req.user.id})
     .then(user => {
-      if (!user) {
+      if (user) {
+        console.log(user)
         req.user = user;
+        // get user id and use where necessary
+        req.body.user = user.id;
+        next();
       } else {
         res.json({ status: false, message: 'User not found' });
       }
     })
     .catch(error => next(error));
+}
 
 export const createUser = (req, res, next) => {
   const email = req.body.email;
@@ -103,12 +110,12 @@ export const createUser = (req, res, next) => {
         if (user) {
           res.status(400).json({ status: false, message: 'email already exist' });
         } else {
-          const user = new User();
-          user.email = email;
-          user.passwordHash = user.generateHashPassword(password);
+          const newUser = new User();
+          newUser.email = email;
+          newUser.passwordHash = newUser.generateHashPassword(password);
 
-          user.save().then(newUser => {
-            req.user = newUser;
+          newUser.save().then(doc => {
+            req.user = doc;
             res.status(200)
               .json({ status: true, data: { token: signIn(req.user._id) } });
           }).catch(error => next(error));

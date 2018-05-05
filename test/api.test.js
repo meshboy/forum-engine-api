@@ -18,7 +18,7 @@ const createApiSec = (model, resourceName, newResource) => {
     beforeEach(async () => {
       await dropDb();
 
-      const user = User.create({ email: 'test@gmail.com', password: '12345' });
+      const user = User.create({ email: 'test@gmail.com', passwordHash: '12345fhg' });
       jwt = signIn(user._id);
     });
 

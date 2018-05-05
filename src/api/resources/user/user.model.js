@@ -1,8 +1,8 @@
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
- **/
+ * */
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 export const schema = {
   email: {
