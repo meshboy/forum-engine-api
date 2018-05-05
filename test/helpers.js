@@ -23,5 +23,5 @@ export const removeModel = modelName => {
   });
 };
 
-export const dropDb = () => mongoose.connect('mongodb://localhost/test-forum-api', { useMongoClient: true })
+export const dropDb = () => mongoose.connect('mongodb://localhost/forum-api-test', { useMongoClient: true })
     .then(() => Promise.all(mongoose.modelNames().map(removeModel)));

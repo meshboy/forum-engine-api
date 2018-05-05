@@ -70,7 +70,7 @@ export const findByParam = model => (req, res, next, id) => controllers.findByPa
       if (!doc) {
         next(new Error('Not Found Error'));
       } else {
-        req.docFromId = doc._id;
+        req.docFromId = doc;
         next();
       }
     })

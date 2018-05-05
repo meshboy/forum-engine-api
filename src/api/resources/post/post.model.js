@@ -19,6 +19,7 @@ export const schema = {
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
       },
       message: {
         type: String,

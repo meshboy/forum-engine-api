@@ -1,10 +1,7 @@
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
 import mongoose from 'mongoose';
+import config from './config';
 
-const dummyUrl = 'mongodb://localhost/forum-api';
-
-export const connect = () => {
-  return mongoose.connect(dummyUrl, { useMongoClient: true })
-}
+export const connect = () => mongoose.connect(config.db.url, { useMongoClient: true });

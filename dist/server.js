@@ -22,7 +22,7 @@ require("source-map-support").install();
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "6891025f352e161abb89"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "537320ba2e721faf05cc"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -948,7 +948,7 @@ var loginUser = function loginUser(req, res, next) {
   // validate the data coming from the client before processing
   var schema = joi__WEBPACK_IMPORTED_MODULE_2___default.a.object().keys({
     email: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string().email(),
-    password: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string()
+    password: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string().required()
   });
 
   var result = joi__WEBPACK_IMPORTED_MODULE_2___default.a.validate({ email: email, password: password }, schema);
@@ -991,7 +991,6 @@ var getUser = function getUser() {
 
     _resources_user_user_model__WEBPACK_IMPORTED_MODULE_3__["User"].findById({ _id: req.user.id }).then(function (user) {
       if (user) {
-        console.log(user);
         req.user = user;
         // get user id and use where necessary
         req.body.user = user.id;
@@ -1012,7 +1011,7 @@ var createUser = function createUser(req, res, next) {
   // validate the data coming from the client before processing
   var schema = joi__WEBPACK_IMPORTED_MODULE_2___default.a.object().keys({
     email: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string().email(),
-    password: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string()
+    password: joi__WEBPACK_IMPORTED_MODULE_2___default.a.string().required()
   });
 
   var result = joi__WEBPACK_IMPORTED_MODULE_2___default.a.validate({ email: email, password: password }, schema);
@@ -1182,7 +1181,7 @@ var findByParam = function findByParam(model) {
       if (!doc) {
         next(new Error('Not Found Error'));
       } else {
-        req.docFromId = doc._id;
+        req.docFromId = doc;
         next();
       }
     }).catch(function (error) {
@@ -1236,23 +1235,53 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _modules_query__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../modules/query */ "./src/api/modules/query.js");
-/* harmony import */ var _post_model__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./post.model */ "./src/api/resources/post/post.model.js");
+/* harmony import */ var joi__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! joi */ "joi");
+/* harmony import */ var joi__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(joi__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _modules_query__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../modules/query */ "./src/api/modules/query.js");
+/* harmony import */ var _post_model__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./post.model */ "./src/api/resources/post/post.model.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/13/18
  * */
 
 
 
+
 var getAll = function getAll(req, res, next) {
-  _post_model__WEBPACK_IMPORTED_MODULE_1__["Post"].find({}).populate('user', { email: 1 }).exec().then(function (docs) {
+  _post_model__WEBPACK_IMPORTED_MODULE_2__["Post"].find({}).populate('user comment.user', { email: 1 }).exec().then(function (docs) {
     return res.json({ status: true, data: docs });
   }).catch(function (error) {
     return next(error);
   });
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (Object(_modules_query__WEBPACK_IMPORTED_MODULE_0__["generateControllers"])(_post_model__WEBPACK_IMPORTED_MODULE_1__["Post"], { getAll: getAll }));
+var updateOne = function updateOne(req, res, next) {
+  var message = req.body.message;
+  var doc = req.docFromId;
+  var user = req.body.user;
+
+  var schema = joi__WEBPACK_IMPORTED_MODULE_0___default.a.object().keys({
+    message: joi__WEBPACK_IMPORTED_MODULE_0___default.a.string().required()
+  });
+
+  var result = joi__WEBPACK_IMPORTED_MODULE_0___default.a.validate({ message: message }, schema);
+
+  if (result.error) {
+    res.status(400).json({ status: false, message: result.error });
+  } else {
+    var commentObject = {
+      user: user,
+      message: message
+    };
+
+    _post_model__WEBPACK_IMPORTED_MODULE_2__["Post"].findByIdAndUpdate(doc._id, { $push: { comment: commentObject } }, { new: true }).exec().then(function (doc) {
+      res.status(200).json({ status: true, data: doc });
+    }).catch(function (error) {
+      return next(error);
+    });
+  }
+};
+
+/* harmony default export */ __webpack_exports__["default"] = (Object(_modules_query__WEBPACK_IMPORTED_MODULE_1__["generateControllers"])(_post_model__WEBPACK_IMPORTED_MODULE_2__["Post"], { getAll: getAll, updateOne: updateOne }));
 
 /***/ }),
 
@@ -1288,7 +1317,8 @@ var schema = {
 
   comment: [{
     user: {
-      type: mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema.Types.ObjectId
+      type: mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.Schema.Types.ObjectId,
+      ref: 'Users'
     },
     message: {
       type: String
@@ -1407,6 +1437,76 @@ router.use(_modules_errorHandler__WEBPACK_IMPORTED_MODULE_2__["errorHandler"]);
 
 /***/ }),
 
+/***/ "./src/config/dev.js":
+/*!***************************!*\
+  !*** ./src/config/dev.js ***!
+  \***************************/
+/*! exports provided: config */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "config", function() { return config; });
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
+ **/
+var config = {
+  expireTime: '10d',
+  secret: 'dev-test',
+  db: {
+    url: 'mongodb://localhost/forum-api'
+  }
+};
+
+/***/ }),
+
+/***/ "./src/config/index.js":
+/*!*****************************!*\
+  !*** ./src/config/index.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babel-runtime/core-js/object/assign */ "babel-runtime/core-js/object/assign");
+/* harmony import */ var babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_0__);
+
+/**
+ *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
+ * */
+var env = "development";
+
+var baseConfig = {
+  port: 3000,
+  expireTime: '10d',
+  secret: 'default-secret',
+  db: {
+    url: 'mongodb://localhost/forum-api'
+  }
+};
+
+var envConfig = {};
+
+switch (env) {
+
+  case 'production':
+    // envConfig = require('./prod').config;
+    break;
+
+  case 'development':
+    envConfig = __webpack_require__(/*! ./dev */ "./src/config/dev.js").config;
+    break;
+
+  default:
+    envConfig = __webpack_require__(/*! ./dev */ "./src/config/dev.js").config;
+    break;
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_0___default()(baseConfig, envConfig));
+
+/***/ }),
+
 /***/ "./src/db.js":
 /*!*******************!*\
   !*** ./src/db.js ***!
@@ -1419,15 +1519,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "connect", function() { return connect; });
 /* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mongoose */ "mongoose");
 /* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./config */ "./src/config/index.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
 
 
-var dummyUrl = 'mongodb://localhost/forum-api';
 
 var connect = function connect() {
-  return mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.connect(dummyUrl, { useMongoClient: true });
+  return mongoose__WEBPACK_IMPORTED_MODULE_0___default.a.connect(_config__WEBPACK_IMPORTED_MODULE_1__["default"].db.url, { useMongoClient: true });
 };
 
 /***/ }),
@@ -1443,28 +1543,30 @@ var connect = function connect() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var http__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! http */ "http");
 /* harmony import */ var http__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(http__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _server__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./server */ "./src/server.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./config */ "./src/config/index.js");
+/* harmony import */ var _server__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./server */ "./src/server.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
 
 
 
 
 
-var server = http__WEBPACK_IMPORTED_MODULE_0___default.a.createServer(_server__WEBPACK_IMPORTED_MODULE_1__["default"]);
-var currentApp = _server__WEBPACK_IMPORTED_MODULE_1__["default"];
 
-server.listen(3000, function () {
+var server = http__WEBPACK_IMPORTED_MODULE_0___default.a.createServer(_server__WEBPACK_IMPORTED_MODULE_2__["default"]);
+var currentApp = _server__WEBPACK_IMPORTED_MODULE_2__["default"];
+
+server.listen(_config__WEBPACK_IMPORTED_MODULE_1__["default"].port, function () {
   console.log('Server listening on port 3000');
 });
 
 if (true) {
-  module.hot.accept([/*! ./server */ "./src/server.js"], function(__WEBPACK_OUTDATED_DEPENDENCIES__) { /* harmony import */ _server__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./server */ "./src/server.js");
+  module.hot.accept([/*! ./server */ "./src/server.js"], function(__WEBPACK_OUTDATED_DEPENDENCIES__) { /* harmony import */ _server__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./server */ "./src/server.js");
 (function () {
     server.removeListener('request', currentApp);
-    server.on('request', _server__WEBPACK_IMPORTED_MODULE_1__["default"]);
-    currentApp = _server__WEBPACK_IMPORTED_MODULE_1__["default"];
+    server.on('request', _server__WEBPACK_IMPORTED_MODULE_2__["default"]);
+    currentApp = _server__WEBPACK_IMPORTED_MODULE_2__["default"];
   })(__WEBPACK_OUTDATED_DEPENDENCIES__); });
 }
 
@@ -1510,9 +1612,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./api/modules/auth */ "./src/api/modules/auth.js");
 /* harmony import */ var _middleware__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./middleware */ "./src/middleware.js");
 /* harmony import */ var _api_router__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./api/router */ "./src/api/router.js");
+/* harmony import */ var _api_modules_errorHandler__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./api/modules/errorHandler */ "./src/api/modules/errorHandler.js");
 /**
  *created by Meshileya Seun <meshileyaseun@gmail.com/> 4/12/18
- **/
+ * */
+
 
 
 
@@ -1527,6 +1631,7 @@ Object(_db__WEBPACK_IMPORTED_MODULE_1__["connect"])();
 app.use('/login', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["loginUser"]);
 app.use('/register', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["createUser"]);
 app.use('/api/v1/', _api_modules_auth__WEBPACK_IMPORTED_MODULE_2__["secure"], _api_router__WEBPACK_IMPORTED_MODULE_4__["router"]);
+app.use(_api_modules_errorHandler__WEBPACK_IMPORTED_MODULE_5__["errorHandler"]);
 /* harmony default export */ __webpack_exports__["default"] = (app);
 
 /***/ }),

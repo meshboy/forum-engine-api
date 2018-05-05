@@ -34,7 +34,7 @@ export const loginUser = (req, res, next) => {
   // validate the data coming from the client before processing
   const schema = Joi.object().keys({
     email: Joi.string().email(),
-    password: Joi.string(),
+    password: Joi.string().required(),
   });
 
   const result = Joi.validate({ email, password }, schema);
@@ -78,7 +78,6 @@ export const getUser = () => (req, res, next) => {
   User.findById({_id: req.user.id})
     .then(user => {
       if (user) {
-        console.log(user)
         req.user = user;
         // get user id and use where necessary
         req.body.user = user.id;
@@ -97,7 +96,7 @@ export const createUser = (req, res, next) => {
   // validate the data coming from the client before processing
   const schema = Joi.object().keys({
     email: Joi.string().email(),
-    password: Joi.string(),
+    password: Joi.string().required(),
   });
 
   const result = Joi.validate({ email, password }, schema);
