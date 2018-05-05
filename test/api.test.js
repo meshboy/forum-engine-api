@@ -18,7 +18,7 @@ const createApiSec = (model, resourceName, newResource) => {
     beforeEach(async () => {
       await dropDb();
 
-      const user = User.create({ email: 'test@gmail.com', passwordHash: '12345fhg' });
+      const user = await User.create({ email: 'test@gmail.com', passwordHash: '12345fhg' });
       jwt = signIn(user._id);
     });
 
@@ -40,19 +40,19 @@ const createApiSec = (model, resourceName, newResource) => {
     describe(`POST /${resourceName}`, () => {
       it(`should create a ${resourceName}`, async () => {
         const result = await chai.request(app)
-          .post(`/api/${resourceName}`)
+          .post(`/api/v1/${resourceName}`)
           .set('Authorization', `Bearer ${jwt}`)
           .send(newResource);
 
-        expect(result).to.have.status(200);
+        expect(result).to.have.status(201);
         expect(result).to.be.json;
       });
     });
 
-    describe(`GET only one /${resourceName}`, () => {
-      it(`should get a single ${resourceName}`, async () => {
+    describe(`GET all /${resourceName}s`, () => {
+      it(`should get all ${resourceName}s`, async () => {
         const result = await chai.request(app)
-          .get(`/api/${resourceName}`)
+          .get(`/api/v1/${resourceName}`)
           .set('Authorization', `Bearer ${jwt}`);
 
         expect(result).to.have.status(200);

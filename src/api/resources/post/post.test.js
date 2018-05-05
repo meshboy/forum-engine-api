@@ -25,4 +25,4 @@ describe('Post Model', () => {
   });
 });
 
-createApiSec(Post, 'Post', { title: 'test title', user: '23456' });
+createApiSec(Post, 'post', { title: 'test title', user: '5aee2ccdba34df2b29e8ce4b' });

@@ -7,7 +7,7 @@ import { Post } from './post.model';
 
 const getAll = (req, res, next) => {
   Post.find({}).populate('user comment.user', { email: 1 }).exec()
-    .then(docs => res.json({ status: true, data: docs }))
+    .then(docs => res.status(200).json({ status: true, data: docs }))
     .catch(error => next(error));
 };
 
